@@ -1,0 +1,9 @@
+Metric,Early,Intermediate,Modern,Early_to_Modern_Change
+Zipf exponent,0.706234,0.893111,1.101121,55.914453
+Heaps exponent,0.769672,0.722787,0.652555,-15.216482
+Taylor exponent,1.040258,1.229030,1.182996,13.721413
+Correlation exponent,0.357585,1.002538,0.355479,-0.588802
+White noise fraction,0.793677,0.483820,0.821316,3.482341
+Entropy rate,4.398338,4.362402,4.420569,0.505443
+Average Strahler,2.750830,1.607714,3.480179,26.513779
+Strahler log coefficient,0.799458,0.681351,0.887545,11.018382

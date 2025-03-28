@@ -1,0 +1,4 @@
+Metric,Early,Intermediate,Modern,Early_to_Modern_Change
+Zipf exponent,0.013722,0.100490,0.055661,305.625622
+Entropy rate,6.873486,7.130524,6.849984,-0.341919
+Average Strahler,5.672425,8.102238,3.218885,-43.253815
