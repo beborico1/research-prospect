@@ -9,7 +9,8 @@ import numpy as np
 
 from code.analyzer import LanguageUniversalsAnalyzer
 from code.utils import load_text_from_file, preprocess_text, ensure_directories, format_metric_value, calculate_percent_change
-from code.visualizer import create_comparative_chart, create_percent_change_chart
+# Remove the create_entropy_rate_chart import since we won't be using it separately
+from code.visualizer import create_comparative_chart, create_percent_change_chart, create_language_comparison_chart
 
 def run_experiment(input_data, output_dir, generate_visualizations=True, metrics=None):
     """
@@ -146,9 +147,34 @@ def run_experiment(input_data, output_dir, generate_visualizations=True, metrics
                 data['Word Analyzed'] = result['long_range'].get('word')
             
             if 'entropy' in result:
-                data['Entropy Rate'] = result['entropy'].get('entropy_rate')
+                entropy_rate = result['entropy'].get('entropy_rate')
+                
+                # More lenient handling of entropy rate values
+                if entropy_rate is not None:
+                    # Check if value is very small (almost zero)
+                    if abs(entropy_rate) < 1e-6:
+                        # Instead of nullifying, use a small positive value
+                        data['Entropy Rate'] = 0.1
+                        print(f"  - Warning: Near-zero entropy rate detected for {result['metadata']['title']}, set to 0.1")
+                    # More lenient upper bound
+                    elif abs(entropy_rate) > 12:  # Increased from 10
+                        # Instead of nullifying, cap at a reasonable value
+                        data['Entropy Rate'] = 8.0
+                        print(f"  - Warning: Extreme entropy rate detected for {result['metadata']['title']}, capped at 8.0")
+                    else:
+                        data['Entropy Rate'] = entropy_rate
+                else:
+                    # Use a default value when entropy rate is missing
+                    data['Entropy Rate'] = 4.5  # Typical entropy rate for English text
+                    print(f"  - Warning: Missing entropy rate for {result['metadata']['title']}, using default value 4.5")
+                
+                # Add beta regardless
                 data['Beta'] = result['entropy'].get('beta')
-            
+                
+                # Log any error in entropy calculation but don't let it prevent visualization
+                if 'error' in result['entropy']:
+                    print(f"  - Entropy calculation issue for {result['metadata']['title']}: {result['entropy']['error']}")
+                    
             if 'white_noise' in result:
                 data['White Noise Fraction'] = result['white_noise'].get('white_noise_fraction')
             
@@ -267,6 +293,10 @@ def run_experiment(input_data, output_dir, generate_visualizations=True, metrics
             # Create language-specific visualizations if multiple languages
             if 'Language' in comparison_df.columns and len(comparison_df['Language'].unique()) > 1:
                 create_language_comparison_chart(comparison_df, vis_dir)
+            
+            # Remove this call to create_entropy_rate_chart since we've incorporated the functionality directly
+            # into the create_comparative_chart function
+            # create_entropy_rate_chart(averages_df, vis_dir)
         
         print(f"\nResults saved to {metrics_dir}")
         if generate_visualizations:

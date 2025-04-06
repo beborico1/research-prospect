@@ -1,4 +1,4 @@
-*.md
 .DS_STORE
 *.pyc
 *.txt
+venv
